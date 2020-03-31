@@ -12,7 +12,6 @@ def upload_to_aws(local_file, bucket, s3_file):
     if not endpoint_url:
         raise Exception("No S3 endpoind passed")
 
-
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key_id,
@@ -28,7 +27,6 @@ def upload_to_aws(local_file, bucket, s3_file):
     except NoCredentialsError:
         print("Credentials not available")
         return False
-
 
 
 if not os.environ.get('IGNITION_CONFIG'):

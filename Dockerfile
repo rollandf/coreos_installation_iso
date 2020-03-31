@@ -2,7 +2,10 @@ FROM python:2.7
 
 COPY ./coreos-installer /
 COPY ./install_process.py /
-COPY ./fedora-coreos-31.20200210.3.0-live.x86_64.iso /
+
+ARG COREOS_IMAGE=<COREOS IMAGE>
+ENV COREOS_IMAGE=$COREOS_IMAGE
+COPY ./$COREOS_IMAGE /
 
 RUN pip install boto3
 RUN pip install botocore
