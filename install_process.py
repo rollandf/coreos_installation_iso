@@ -12,6 +12,7 @@ def upload_to_aws(local_file, bucket, s3_file):
     if not endpoint_url:
         raise Exception("No S3 endpoind passed")
 
+
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key_id,
@@ -29,6 +30,7 @@ def upload_to_aws(local_file, bucket, s3_file):
         return False
 
 
+
 if not os.environ.get('IGNITION_CONFIG'):
     raise Exception("ignition file not passed")
 
@@ -37,7 +39,7 @@ with open('ignition.config', 'w') as f:
 
 image_name = os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30)))
 
-command = "./coreos-installer iso embed -c ignition.config -o {} fedora-coreos-31.20200210.3.0-live.x86_64.iso".format(image_name)
+command = "./coreos-installer iso embed -c ignition.config -o {} {} -f".format(image_name, os.environ.get("COREOS_IMAGE")
 
 subprocess.check_output(command, shell=True)
 
