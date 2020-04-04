@@ -7,6 +7,9 @@ ARG COREOS_IMAGE=<COREOS IMAGE>
 ENV COREOS_IMAGE=$COREOS_IMAGE
 COPY ./$COREOS_IMAGE /
 
+COPY ./coreos-installer /
+COPY ./install_process.py /
+
 RUN pip install boto3
 RUN pip install botocore
 

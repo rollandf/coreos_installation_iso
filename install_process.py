@@ -39,7 +39,7 @@ with open('ignition.config', 'w') as f:
 
 image_name = os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30)))
 
-command = "./coreos-installer iso embed -c ignition.config -o {} {} -f".format(image_name, os.environ.get("COREOS_IMAGE")
+command = "./coreos-installer iso embed -c ignition.config -o {} {} -f".format(image_name, os.environ.get("COREOS_IMAGE"))
 
 subprocess.check_output(command, shell=True)
 
