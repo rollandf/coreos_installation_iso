@@ -1,16 +1,21 @@
 FROM python:2.7
 
-COPY ./coreos-installer /
-COPY ./install_process.py /
+ARG WORK_DIR=/data
 
-ARG COREOS_IMAGE=<COREOS IMAGE>
-ENV COREOS_IMAGE=$COREOS_IMAGE
-COPY ./$COREOS_IMAGE /
+RUN mkdir $WORK_DIR
+RUN chmod 777 $WORK_DIR
 
-COPY ./coreos-installer /
-COPY ./install_process.py /
+ARG COREOS_IMAGE
+COPY ./$COREOS_IMAGE $WORK_DIR
+RUN chmod 666 $WORK_DIR/$COREOS_IMAGE
+ENV COREOS_IMAGE=$WORK_DIR/$COREOS_IMAGE
+
+COPY ./coreos-installer $WORK_DIR
+COPY ./install_process.py $WORK_DIR
+
+ENV WORK_DIR=$WORK_DIR
 
 RUN pip install boto3
 RUN pip install botocore
 
-CMD python install_process.py
+CMD python /data/install_process.py

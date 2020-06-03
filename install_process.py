@@ -34,14 +34,20 @@ def upload_to_aws(local_file, bucket, s3_file):
 if not os.environ.get('IGNITION_CONFIG'):
     raise Exception("ignition file not passed")
 
-with open('ignition.config', 'w') as f:
+work_dir = os.environ.get("WORK_DIR")
+if not work_dir:
+    raise Exception("working directory was not defined")
+
+with open(os.path.join(work_dir, '/data/ignition.config'), 'w') as f:
     f.write(os.environ['IGNITION_CONFIG'])
 
-image_name = os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30)))
+image_name = os.path.join(work_dir, os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30))))
+s3_name = os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30)))
 
-command = "./coreos-installer iso embed -c ignition.config -o {} {} -f".format(image_name, os.environ.get("COREOS_IMAGE"))
+command = "%s/coreos-installer iso embed -c %s/ignition.config -o %s %s -f" % (work_dir, work_dir, image_name, os.environ.get("COREOS_IMAGE"))
+print("command to executes is:<%s>" % command) 
 
 subprocess.check_output(command, shell=True)
 
 bucket_name = os.environ.get('S3_BUCKET', 'test')
-uploaded = upload_to_aws(image_name, bucket_name, image_name)
+uploaded = upload_to_aws(image_name, bucket_name, s3_name)
