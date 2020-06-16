@@ -17,13 +17,13 @@ jobs:
       - name: Get the tag
         id: get_tag
         run: echo ::set-env name=GIT_TAG::${GITHUB_REF/refs\/tags\//}
-      - name: Publish Installer to Registry
+      - name: Publish installer-image-build to Registry
         uses: elgohr/Publish-Docker-Github-Action@2.15
         with:
-          name: process-ignition-manifests-and-kubeconfig
+          name: installer-image-build
           username: ${{ secrets.OCPMETAL_USERNAME }}
           password: ${{ secrets.OCPMETAL_PASSWORD }}
           REGISTRY: 'quay.io/ocpmetal'
-          dockerfile: Dockerfile.process-ignition-manifests-and-kubeconfig
+          dockerfile: Dockerfile
           buildargs: GIT_REVISION
           tags: "${{ env.GIT_TAG }},${{ env.GIT_REVISION }}"
