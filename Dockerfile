@@ -1,4 +1,4 @@
-FROM quay.io/yshnaidm/livecd-iso:fedora-coreos-livecd
+FROM quay.io/ocpmetal/livecd-iso:fedora-coreos-livecd
 
 FROM python:2.7
 
