@@ -24,6 +24,6 @@ jobs:
           username: ${{ secrets.OCPMETAL_USERNAME }}
           password: ${{ secrets.OCPMETAL_PASSWORD }}
           REGISTRY: 'quay.io/ocpmetal'
-          dockerfile: Dockerfile
+          dockerfile: Dockerfile.installer-image-build
           buildargs: GIT_REVISION
           tags: "${{ env.GIT_TAG }},${{ env.GIT_REVISION }}"
