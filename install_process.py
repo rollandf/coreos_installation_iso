@@ -1,6 +1,7 @@
 import subprocess
 import random
 import os
+import time
 import boto3
 from botocore.exceptions import NoCredentialsError
 
@@ -21,6 +22,8 @@ def upload_to_aws(local_file, bucket, s3_file):
 
     try:
         s3_client.upload_file(local_file, bucket, s3_file, ExtraArgs={'ACL': 'public-read'})
+        s3_client.put_object_tagging(Bucket=bucket, Key=s3_file,
+                                     Tagging={'TagSet': [{'Key': 'create_sec_since_epoch', 'Value': str(int(time.time()))}]})
         print("Upload Successful")
 
         return True
@@ -29,23 +32,28 @@ def upload_to_aws(local_file, bucket, s3_file):
         return False
 
 
-if not os.environ.get('IGNITION_CONFIG'):
-    raise Exception("ignition file not passed")
+def main():
+    if not os.environ.get('IGNITION_CONFIG'):
+        raise Exception("ignition file not passed")
 
-work_dir = os.environ.get("WORK_DIR")
-if not work_dir:
-    raise Exception("working directory was not defined")
+    work_dir = os.environ.get("WORK_DIR")
+    if not work_dir:
+        raise Exception("working directory was not defined")
 
-with open(os.path.join(work_dir, '/data/ignition.config'), 'w') as f:
-    f.write(os.environ['IGNITION_CONFIG'])
+    with open(os.path.join(work_dir, '/data/ignition.config'), 'w') as file_desc:
+        file_desc.write(os.environ['IGNITION_CONFIG'])
 
-image_name = os.path.join(work_dir, os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30))))
-s3_name = os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30)))
+    image_name = os.path.join(work_dir, os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30))))
+    s3_name = os.environ.get("IMAGE_NAME", "coreos_install{}.img".format(random.getrandbits(30)))
 
-command = "%s/coreos-installer iso embed -c %s/ignition.config -o %s %s -f" % (work_dir, work_dir, image_name, os.environ.get("COREOS_IMAGE"))
-print("command to executes is:<%s>" % command)
+    command = "%s/coreos-installer iso embed -c %s/ignition.config -o %s %s -f" % (work_dir, work_dir, image_name,
+                                                                                   os.environ.get("COREOS_IMAGE"))
+    print("command to executes is:<%s>" % command)
 
-subprocess.check_output(command, shell=True)
+    subprocess.check_output(command, shell=True)
 
-bucket_name = os.environ.get('S3_BUCKET', 'test')
-upload_to_aws(image_name, bucket_name, s3_name)
+    bucket_name = os.environ.get('S3_BUCKET', 'test')
+    upload_to_aws(image_name, bucket_name, s3_name)
+
+if __name__ == "__main__":
+    main()
